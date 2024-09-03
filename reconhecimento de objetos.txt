@@ -1,0 +1,209 @@
+pip install torch torchvision torchaudio
+pip install opencv-python-headless
+pip install matplotlib
+pip install pillow
+pip install opencv-python
+
+
+git clone https://github.com/ultralytics/yolov5
+cd yolov5
+pip install -r requirements.txt
+pip install requests pillow
+
+
+/dataset
+    /images
+        /train
+        /val
+    /labels
+        /train
+        /val
+
+class_id center_x center_y width height
+
+
+train: dataset/images/train
+val: dataset/images/val
+
+nc: 1  # Número de classes
+names: ['class_name']  # Nome da classe
+
+python train.py --img 96 --batch 16 --epochs 50 --data data.yaml --weights yolov5s.pt --name yolov5_model
+
+python val.py --weights runs/train/yolov5_model/weights/best.pt --data data.yaml --img-size 96
+
+import torch
+from pathlib import Path
+import cv2
+import matplotlib.pyplot as plt
+
+# Carregar o modelo treinado
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='runs/train/yolov5_model/weights/best.pt', source='local')
+
+# Carregar e preparar a imagem
+def load_image(image_path, img_size=96):
+    img = cv2.imread(image_path)
+    img = cv2.resize(img, (img_size, img_size))
+    img = img[...,::-1]  # Convert BGR to RGB
+    return img
+
+image_path = 'path/to/your/image.jpg'
+img = load_image(image_path)
+
+# Fazer predição
+results = model(img)
+
+# Mostrar resultados
+results.show()
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.show()
+
+import requests
+from PIL import Image
+from io import BytesIO
+import matplotlib.pyplot as plt
+
+def download_image(image_url):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        img = Image.open(BytesIO(response.content))
+        return img
+    else:
+        raise Exception("Failed to download image")
+
+# URL da imagem
+image_url = 'https://example.com/path/to/image.jpg'
+
+# Baixar e processar a imagem
+img = download_image(image_url)
+
+# Redimensionar para 96x96 pixels
+img = img.resize((96, 96))
+
+# Mostrar a imagem
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+
+import torch
+from PIL import Image
+import matplotlib.pyplot as plt
+
+# Carregar o modelo treinado
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='runs/train/yolov5_model/weights/best.pt', source='local')
+
+# Carregar e preparar a imagem
+def prepare_image(image_path, img_size=96):
+    img = Image.open(image_path)
+    img = img.resize((img_size, img_size))
+    return img
+
+image_path = 'path/to/your/image.jpg'
+img = prepare_image(image_path)
+
+# Converter para formato que o modelo espera
+img_tensor = torch.tensor(np.array(img)).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+
+# Fazer predição
+results = model(img_tensor)
+
+# Mostrar resultados
+results.show()
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+
+import torch
+import requests
+from PIL import Image
+from io import BytesIO
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Carregar o modelo treinado
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='runs/train/yolov5_model/weights/best.pt', source='local')
+
+# Função para baixar e preparar a imagem
+def prepare_image_from_url(image_url, img_size=96):
+    response = requests.get(image_url)
+    img = Image.open(BytesIO(response.content))
+    img = img.resize((img_size, img_size))
+    return img
+
+# URL da imagem
+image_url = 'https://example.com/path/to/image.jpg'
+img = prepare_image_from_url(image_url)
+
+# Converter para formato que o modelo espera
+img_tensor = torch.tensor(np.array(img)).permute(2, 0, 1).unsqueeze(0).float() / 255.0
+
+# Fazer predição
+results = model(img_tensor)
+
+# Mostrar resultados
+results.show()
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+
+from PIL import Image
+
+def resize_image(image_path, output_path, size=(96, 96)):
+    # Abrir a imagem
+    img = Image.open(image_path)
+    
+    # Redimensionar a imagem
+    img_resized = img.resize(size, Image.ANTIALIAS)
+    
+    # Salvar a imagem redimensionada
+    img_resized.save(output_path)
+
+# Caminhos para a imagem original e a imagem redimensionada
+input_image_path = 'path/to/your/image.jpg'
+output_image_path = 'path/to/your/resized_image.jpg'
+
+resize_image(input_image_path, output_image_path)
+
+import cv2
+
+def resize_image(image_path, output_path, size=(96, 96)):
+    # Ler a imagem
+    img = cv2.imread(image_path)
+    
+    # Redimensionar a imagem
+    img_resized = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
+    
+    # Salvar a imagem redimensionada
+    cv2.imwrite(output_path, img_resized)
+
+# Caminhos para a imagem original e a imagem redimensionada
+input_image_path = 'path/to/your/image.jpg'
+output_image_path = 'path/to/your/resized_image.jpg'
+
+resize_image(input_image_path, output_image_path)
+
+from PIL import Image
+
+def resize_and_crop(image_path, output_path, size=(96, 96)):
+    img = Image.open(image_path)
+    
+    # Redimensionar mantendo a proporção
+    img.thumbnail(size, Image.ANTIALIAS)
+    
+    # Criar uma nova imagem com o tamanho desejado e preencher com branco
+    new_img = Image.new('RGB', size, (255, 255, 255))
+    
+    # Calcular a posição para centralizar a imagem redimensionada
+    x = (size[0] - img.width) // 2
+    y = (size[1] - img.height) // 2
+    
+    # Colar a imagem redimensionada na nova imagem
+    new_img.paste(img, (x, y))
+    
+    # Salvar a imagem redimensionada
+    new_img.save(output_path)
+
+input_image_path = 'path/to/your/image.jpg'
+output_image_path = 'path/to/your/resized_image.jpg'
+
+resize_and_crop(input_image_path, output_image_path)
